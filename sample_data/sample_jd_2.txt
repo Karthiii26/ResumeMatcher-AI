@@ -1,0 +1,36 @@
+Machine Learning Engineer
+
+About Us
+We're building the next generation of AI-powered products. Our ML team works on cutting-edge problems in NLP, computer vision, and recommendation systems at scale.
+
+Responsibilities
+- Design, train, and deploy machine learning models for production systems
+- Build and optimize data pipelines for model training and inference
+- Develop NLP solutions for text classification, entity extraction, and semantic search
+- Conduct experiments and A/B tests to validate model performance
+- Collaborate with product and engineering teams to integrate ML into products
+- Stay current with latest ML research and evaluate new techniques for adoption
+- Write technical documentation and present findings to stakeholders
+
+Required Qualifications
+- MS or PhD in Computer Science, Machine Learning, Statistics, or related field
+- 3+ years of experience building and deploying ML models in production
+- Strong programming skills in Python
+- Deep experience with ML frameworks (TensorFlow, PyTorch, or JAX)
+- Experience with NLP techniques and transformer-based models
+- Proficiency in SQL and data manipulation (Pandas, NumPy)
+- Experience with cloud ML services (AWS SageMaker, GCP Vertex AI, or Azure ML)
+- Strong foundation in statistics and experimental design
+
+Nice to Have
+- Experience with large language models (LLMs) and prompt engineering
+- Knowledge of MLOps tools (MLflow, Kubeflow, Weights & Biases)
+- Experience with distributed computing (Spark, Ray)
+- Published research in ML/AI conferences (NeurIPS, ICML, ACL, etc.)
+- Experience with recommendation systems or search ranking
+- Familiarity with containerization and Kubernetes for model serving
+
+Compensation
+- Base salary: $170K - $220K
+- Equity package
+- Annual learning stipend

@@ -1,0 +1,30 @@
+Data Engineer
+
+About the Role
+Join our data platform team to build and maintain the infrastructure that powers our data-driven organization. You'll work on large-scale data systems processing billions of events daily.
+
+Responsibilities
+- Design, build, and maintain scalable ETL/ELT data pipelines
+- Build and manage data warehouse and data lake architectures
+- Develop real-time streaming data processing systems
+- Ensure data quality, reliability, and governance across the platform
+- Optimize query performance and data storage costs
+- Collaborate with data scientists and analysts to enable self-service analytics
+- Implement data monitoring and alerting systems
+
+Required Skills
+- 3+ years of experience in data engineering
+- Strong proficiency in Python and SQL
+- Experience with ETL/ELT tools and frameworks (Apache Airflow, dbt, Luigi)
+- Experience with cloud data platforms (AWS Redshift, Google BigQuery, Snowflake)
+- Knowledge of data warehousing concepts and dimensional modeling
+- Experience with big data technologies (Apache Spark, Kafka, Hadoop)
+- Familiarity with containerization (Docker) and CI/CD practices
+
+Preferred Skills
+- Experience with real-time streaming (Kafka Streams, Apache Flink)
+- Knowledge of data governance and cataloging tools
+- Experience with infrastructure-as-code (Terraform)
+- Familiarity with machine learning pipelines and feature stores
+- Experience with dbt for data transformation
+- Knowledge of graph databases or NoSQL solutions

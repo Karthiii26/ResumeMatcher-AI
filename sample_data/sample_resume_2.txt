@@ -1,0 +1,40 @@
+SUMMARY
+Data scientist with 4 years of experience in machine learning, statistical modeling, and data analysis. Passionate about using data to solve complex business problems and drive decision-making.
+
+SKILLS
+Python, R, SQL, TensorFlow, PyTorch, Scikit-learn, Pandas, NumPy, Matplotlib, Seaborn, Jupyter Notebooks, Tableau, Power BI, Apache Spark, Hadoop, A/B Testing, Statistical Analysis, Natural Language Processing, Computer Vision
+
+WORK EXPERIENCE
+
+Data Scientist | DataDriven Corp. | Mar 2021 – Present
+- Built and deployed machine learning models for customer churn prediction achieving 92% accuracy
+- Developed NLP pipeline for sentiment analysis of customer reviews processing 100K+ reviews monthly
+- Designed A/B testing framework used across 3 product teams to validate feature launches
+- Created interactive Tableau dashboards for executive stakeholders tracking KPIs
+- Collaborated with engineering team to deploy ML models to production using Docker and FastAPI
+
+Data Analyst | Analytics Co. | Jul 2019 – Feb 2021
+- Analyzed large datasets using Python and SQL to identify business trends and opportunities
+- Built predictive models for sales forecasting reducing inventory costs by 15%
+- Automated weekly reporting workflows using Python scripts saving 10 hours per week
+- Presented data-driven insights to non-technical stakeholders through clear visualizations
+
+Research Assistant | University ML Lab | Sep 2017 – Jun 2019
+- Conducted research on deep learning architectures for image classification
+- Published 2 papers on transfer learning techniques in peer-reviewed conferences
+- Implemented and benchmarked CNN architectures using TensorFlow and PyTorch
+
+EDUCATION
+
+Master of Science in Data Science | Tech University | 2019
+- Thesis: "Transfer Learning for Small-Sample Image Classification"
+- GPA: 3.9/4.0
+
+Bachelor of Science in Mathematics | Liberal Arts College | 2017
+- Minor in Computer Science
+- GPA: 3.6/4.0
+
+CERTIFICATIONS
+- AWS Certified Machine Learning – Specialty
+- Google Professional Data Engineer
+- Deep Learning Specialization (Coursera, Andrew Ng)

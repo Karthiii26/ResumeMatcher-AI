@@ -1,0 +1,40 @@
+SKILLS
+Python, JavaScript, TypeScript, React, Node.js, Express.js, PostgreSQL, MongoDB, Docker, Kubernetes, AWS (EC2, S3, Lambda), Git, CI/CD pipelines, REST API design, GraphQL
+
+EXPERIENCE
+
+Senior Software Engineer | TechCorp Inc. | Jan 2022 – Present
+- Designed and built scalable microservices architecture serving 2M+ daily active users
+- Led migration from monolithic Django application to containerized microservices using Docker and Kubernetes
+- Built and maintained ETL data pipelines using Apache Airflow for real-time analytics processing
+- Implemented CI/CD pipelines with GitHub Actions reducing deployment time by 60%
+- Mentored team of 4 junior engineers through code reviews and pair programming sessions
+
+Software Engineer | StartupXYZ | Jun 2019 – Dec 2021
+- Developed full-stack web applications using React frontend and Node.js/Express backend
+- Designed and optimized PostgreSQL database schemas handling 500K+ records
+- Integrated third-party APIs including Stripe payments, Twilio SMS, and SendGrid email
+- Wrote comprehensive unit and integration tests achieving 85% code coverage
+- Participated in agile sprints with 2-week cycles, daily standups, and retrospectives
+
+Junior Developer | WebAgency Co. | Aug 2017 – May 2019
+- Built responsive websites using HTML, CSS, JavaScript for 20+ client projects
+- Created reusable React component library reducing development time by 30%
+- Managed MySQL databases and wrote complex SQL queries for reporting dashboards
+
+EDUCATION
+
+Bachelor of Science in Computer Science | State University | 2017
+- GPA: 3.7/4.0
+- Relevant coursework: Data Structures, Algorithms, Database Systems, Operating Systems, Software Engineering
+
+PROJECTS
+
+Open Source Contribution — Kubernetes Dashboard Plugin
+- Developed a monitoring plugin for Kubernetes clusters visualizing pod health and resource usage
+- Tech stack: Go, React, Prometheus, Grafana
+- 200+ GitHub stars, actively maintained
+
+Personal Finance Tracker
+- Full-stack app for tracking expenses with ML-based spending predictions
+- Built with Python (FastAPI), React, PostgreSQL, deployed on AWS

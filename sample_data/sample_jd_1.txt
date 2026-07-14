@@ -1,0 +1,38 @@
+Senior Full-Stack Engineer
+
+About the Role
+We are looking for a Senior Full-Stack Engineer to join our growing platform team. You will be responsible for building and scaling our core web application used by thousands of businesses worldwide.
+
+Responsibilities
+- Design, develop, and maintain scalable web applications using modern frameworks
+- Build robust RESTful APIs and integrate with third-party services
+- Write clean, well-tested, maintainable code with comprehensive test coverage
+- Collaborate with product managers, designers, and other engineers in an agile environment
+- Participate in code reviews and mentor junior team members
+- Contribute to architectural decisions and technical roadmap planning
+- Monitor application performance and troubleshoot production issues
+
+Required Skills
+- 5+ years of experience in full-stack web development
+- Strong proficiency in Python or Node.js for backend development
+- Experience with React or Vue.js for frontend development
+- Proficiency with relational databases (PostgreSQL, MySQL) and query optimization
+- Experience with cloud platforms (AWS, GCP, or Azure)
+- Solid understanding of CI/CD pipelines and DevOps practices
+- Experience with containerization (Docker) and orchestration (Kubernetes)
+- Strong understanding of RESTful API design principles
+
+Preferred Skills
+- Experience with microservices architecture
+- Familiarity with message queues (RabbitMQ, Kafka)
+- Experience with GraphQL
+- Knowledge of infrastructure-as-code (Terraform, CloudFormation)
+- Experience with monitoring tools (Datadog, New Relic, Prometheus)
+- Contributions to open-source projects
+
+Benefits
+- Competitive salary ($150K - $200K)
+- Remote-friendly work environment
+- Health, dental, and vision insurance
+- 401(k) with company match
+- Learning and development budget
