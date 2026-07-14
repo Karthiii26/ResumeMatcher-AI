@@ -5,7 +5,9 @@ import requests
 from sklearn.metrics.pairwise import cosine_similarity
 
 HF_TOKEN = os.environ.get("HF_TOKEN", "")
-HF_API_URL = "https://api-inference.huggingface.co/models/sentence-transformers/all-MiniLM-L6-v2"
+# NOTE: HF fully retired api-inference.huggingface.co (returns 410 Gone).
+# All serverless inference now goes through the router endpoint.
+HF_API_URL = "https://router.huggingface.co/hf-inference/models/sentence-transformers/all-MiniLM-L6-v2/pipeline/feature-extraction"
 
 def get_embeddings(texts, model=None):
     """
@@ -31,6 +33,11 @@ def get_embeddings(texts, model=None):
             if resp.status_code == 503:   # model loading on HF side
                 time.sleep(10)
                 continue
+            if resp.status_code == 410:
+                raise RuntimeError(
+                    "HF Inference API endpoint has moved/retired. "
+                    f"Response: {resp.text}"
+                )
             raise RuntimeError(f"HF Inference API error {resp.status_code}: {resp.text}")
         raise RuntimeError("HF Inference API timed out after 3 retries.")
     else:
