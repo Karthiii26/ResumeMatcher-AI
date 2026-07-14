@@ -21,13 +21,20 @@ def get_embeddings(texts, model=None):
     if HF_TOKEN:
         # Use HF Inference API — no PyTorch needed, runs fine on 512MB RAM
         headers = {"Authorization": f"Bearer {HF_TOKEN}"}
-        for attempt in range(3):
-            resp = requests.post(
-                HF_API_URL,
-                headers=headers,
-                json={"inputs": texts, "options": {"wait_for_model": True}},
-                timeout=60,
-            )
+        last_error = None
+        for attempt in range(5):
+            try:
+                resp = requests.post(
+                    HF_API_URL,
+                    headers=headers,
+                    json={"inputs": texts, "options": {"wait_for_model": True}},
+                    timeout=60,
+                )
+            except requests.exceptions.RequestException as e:
+                last_error = str(e)
+                time.sleep(3 * (attempt + 1))
+                continue
+
             if resp.status_code == 200:
                 return np.array(resp.json(), dtype=np.float32)
             if resp.status_code == 503:   # model loading on HF side
@@ -38,8 +45,13 @@ def get_embeddings(texts, model=None):
                     "HF Inference API endpoint has moved/retired. "
                     f"Response: {resp.text}"
                 )
+            if resp.status_code >= 500:
+                # Transient server-side error on HF's end — retry with backoff
+                last_error = f"HF Inference API error {resp.status_code}: {resp.text}"
+                time.sleep(3 * (attempt + 1))
+                continue
             raise RuntimeError(f"HF Inference API error {resp.status_code}: {resp.text}")
-        raise RuntimeError("HF Inference API timed out after 3 retries.")
+        raise RuntimeError(f"HF Inference API failed after 5 retries. Last error: {last_error}")
     else:
         # Local fallback (development / no HF_TOKEN)
         from functools import lru_cache
