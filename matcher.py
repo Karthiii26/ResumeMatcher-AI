@@ -104,10 +104,28 @@ def match_jd_to_resume(resume_sections, jd_sections, threshold_strong=0.55, thre
                 "responsibilities": []
             }
         }
-        
-    # Generate embeddings for all resume chunks
-    resume_embeddings = get_embeddings(resume_chunks)
-    
+
+    # Build ONE combined batch: resume chunks + every JD category's chunks.
+    # This means a single HF API call instead of 4 separate round-trips
+    # (which was the main cause of slow requests: each call pays its own
+    # network latency + potential model cold-start on HF's side).
+    categories_order = ["required_skills", "preferred_skills", "responsibilities"]
+    jd_chunks_by_category = {cat: jd_sections.get(cat, []) for cat in categories_order}
+
+    combined_texts = list(resume_chunks)
+    category_slices = {}  # category -> (start_idx, end_idx) within combined_texts
+    cursor = len(resume_chunks)
+    for cat in categories_order:
+        chunks = jd_chunks_by_category[cat]
+        start = cursor
+        cursor += len(chunks)
+        category_slices[cat] = (start, cursor)
+        combined_texts.extend(chunks)
+
+    # Single embedding call for everything
+    all_embeddings = get_embeddings(combined_texts)
+    resume_embeddings = all_embeddings[: len(resume_chunks)]
+
     results = {
         "overall_score": 0.0,
         "categories": {
@@ -120,14 +138,14 @@ def match_jd_to_resume(resume_sections, jd_sections, threshold_strong=0.55, thre
     total_requirements = 0
     scored_points = 0.0
     
-    # Loop over JD categories
-    for category in ["required_skills", "preferred_skills", "responsibilities"]:
-        jd_chunks = jd_sections.get(category, [])
+    # Loop over JD categories (embeddings already computed above)
+    for category in categories_order:
+        jd_chunks = jd_chunks_by_category[category]
         if not jd_chunks:
             continue
-            
-        # Generate embeddings for JD chunks
-        jd_embeddings = get_embeddings(jd_chunks)
+
+        start, end = category_slices[category]
+        jd_embeddings = all_embeddings[start:end]
         
         # Compute cosine similarity matrix
         # Shape: (len(jd_chunks), len(resume_chunks))
