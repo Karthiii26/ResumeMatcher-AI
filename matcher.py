@@ -1,15 +1,25 @@
+import os
 import numpy as np
-from sentence_transformers import SentenceTransformer
+from functools import lru_cache
 from sklearn.metrics.pairwise import cosine_similarity
-import streamlit as st
 
-# We use st.cache_resource to ensure the model is loaded only once and cached across app reruns.
-@st.cache_resource
+# Reduce memory usage: single thread for CPU math ops
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+os.environ.setdefault("MKL_NUM_THREADS", "1")
+
+@lru_cache(maxsize=1)
 def get_model():
     """
-    Load the sentence-transformer model and cache it.
+    Load the sentence-transformer model exactly once and cache it in memory.
+    Uses lru_cache so subsequent calls return the same instance.
     """
-    return SentenceTransformer('all-MiniLM-L6-v2')
+    from sentence_transformers import SentenceTransformer
+    import torch
+    model = SentenceTransformer('all-MiniLM-L6-v2')
+    model.eval()                         # disable dropout / training behaviour
+    if hasattr(torch, 'no_grad'):        # future-proof
+        pass
+    return model
 
 def get_embeddings(texts, model=None):
     """
@@ -20,8 +30,9 @@ def get_embeddings(texts, model=None):
         return np.empty((0, 384))
     if model is None:
         model = get_model()
-    # encode returns a numpy array by default
-    return model.encode(texts, show_progress_bar=False, normalize_embeddings=True)
+    import torch
+    with torch.no_grad():
+        return model.encode(texts, show_progress_bar=False, normalize_embeddings=True, convert_to_numpy=True)
 
 def match_jd_to_resume(resume_sections, jd_sections, threshold_strong=0.55, threshold_partial=0.35):
     """
