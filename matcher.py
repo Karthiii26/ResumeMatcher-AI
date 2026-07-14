@@ -1,38 +1,55 @@
 import os
+import time
 import numpy as np
-from functools import lru_cache
+import requests
 from sklearn.metrics.pairwise import cosine_similarity
 
-# Reduce memory usage: single thread for CPU math ops
-os.environ.setdefault("OMP_NUM_THREADS", "1")
-os.environ.setdefault("MKL_NUM_THREADS", "1")
-
-@lru_cache(maxsize=1)
-def get_model():
-    """
-    Load the sentence-transformer model exactly once and cache it in memory.
-    Uses lru_cache so subsequent calls return the same instance.
-    """
-    from sentence_transformers import SentenceTransformer
-    import torch
-    model = SentenceTransformer('all-MiniLM-L6-v2')
-    model.eval()                         # disable dropout / training behaviour
-    if hasattr(torch, 'no_grad'):        # future-proof
-        pass
-    return model
+HF_TOKEN = os.environ.get("HF_TOKEN", "")
+HF_API_URL = "https://api-inference.huggingface.co/models/sentence-transformers/all-MiniLM-L6-v2"
 
 def get_embeddings(texts, model=None):
     """
-    Generate embeddings for a list of texts.
-    Returns a numpy array of embeddings.
+    Generate embeddings using the HF Inference API (if HF_TOKEN is set)
+    or fall back to a local SentenceTransformer model.
+    Returns a numpy array of shape (N, 384).
     """
     if not texts:
         return np.empty((0, 384))
-    if model is None:
-        model = get_model()
-    import torch
-    with torch.no_grad():
-        return model.encode(texts, show_progress_bar=False, normalize_embeddings=True, convert_to_numpy=True)
+
+    if HF_TOKEN:
+        # Use HF Inference API — no PyTorch needed, runs fine on 512MB RAM
+        headers = {"Authorization": f"Bearer {HF_TOKEN}"}
+        for attempt in range(3):
+            resp = requests.post(
+                HF_API_URL,
+                headers=headers,
+                json={"inputs": texts, "options": {"wait_for_model": True}},
+                timeout=60,
+            )
+            if resp.status_code == 200:
+                return np.array(resp.json(), dtype=np.float32)
+            if resp.status_code == 503:   # model loading on HF side
+                time.sleep(10)
+                continue
+            raise RuntimeError(f"HF Inference API error {resp.status_code}: {resp.text}")
+        raise RuntimeError("HF Inference API timed out after 3 retries.")
+    else:
+        # Local fallback (development / no HF_TOKEN)
+        from functools import lru_cache
+
+        @lru_cache(maxsize=1)
+        def _get_local_model():
+            from sentence_transformers import SentenceTransformer
+            m = SentenceTransformer('all-MiniLM-L6-v2')
+            m.eval()
+            return m
+
+        import torch
+        mdl = _get_local_model()
+        with torch.no_grad():
+            return mdl.encode(texts, show_progress_bar=False,
+                              normalize_embeddings=True, convert_to_numpy=True)
+
 
 def match_jd_to_resume(resume_sections, jd_sections, threshold_strong=0.55, threshold_partial=0.35):
     """
