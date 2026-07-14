@@ -66,8 +66,6 @@ def match_jd_to_resume(resume_sections, jd_sections, threshold_strong=0.55, thre
         }
     }
     """
-    model = get_model()
-    
     # Flatten all resume chunks and keep track of which section they came from
     resume_chunks = []
     resume_chunk_sources = []
@@ -89,7 +87,7 @@ def match_jd_to_resume(resume_sections, jd_sections, threshold_strong=0.55, thre
         }
         
     # Generate embeddings for all resume chunks
-    resume_embeddings = get_embeddings(resume_chunks, model)
+    resume_embeddings = get_embeddings(resume_chunks)
     
     results = {
         "overall_score": 0.0,
@@ -110,7 +108,7 @@ def match_jd_to_resume(resume_sections, jd_sections, threshold_strong=0.55, thre
             continue
             
         # Generate embeddings for JD chunks
-        jd_embeddings = get_embeddings(jd_chunks, model)
+        jd_embeddings = get_embeddings(jd_chunks)
         
         # Compute cosine similarity matrix
         # Shape: (len(jd_chunks), len(resume_chunks))
