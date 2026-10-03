@@ -272,7 +272,7 @@ export default function App() {
           {/* Logo */}
           <div className="animate-logo-pop">
             <img
-              src="/logo.jpg"
+              src="/favicon.svg"
               alt="ResumeMatcher AI logo"
               className="w-16 h-16 rounded-2xl shadow-md object-cover"
             />
