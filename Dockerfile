@@ -29,4 +29,4 @@ COPY sample_data ./sample_data
 
 EXPOSE 10000
 
-CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "10000"]
+CMD uvicorn api:app --host 0.0.0.0 --port ${PORT:-10000}
