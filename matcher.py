@@ -1,73 +1,24 @@
-import os
-import time
 import numpy as np
-import requests
-from sklearn.metrics.pairwise import cosine_similarity
 
-HF_TOKEN = os.environ.get("HF_TOKEN", "")
-# NOTE: HF fully retired api-inference.huggingface.co (returns 410 Gone).
-# All serverless inference now goes through the router endpoint.
-HF_API_URL = "https://router.huggingface.co/hf-inference/models/sentence-transformers/all-MiniLM-L6-v2/pipeline/feature-extraction"
-
+# Local embeddings are served by model_runtime, which loads and warms MiniLM
+# exactly once during FastAPI lifespan startup.
 def get_embeddings(texts, model=None):
     """
-    Generate embeddings using the HF Inference API (if HF_TOKEN is set)
-    or fall back to a local SentenceTransformer model.
+    Generate sentence embeddings locally using all-MiniLM-L6-v2.
     Returns a numpy array of shape (N, 384).
     """
     if not texts:
         return np.empty((0, 384))
 
-    if HF_TOKEN:
-        # Use HF Inference API — no PyTorch needed, runs fine on 512MB RAM
-        headers = {"Authorization": f"Bearer {HF_TOKEN}"}
-        last_error = None
-        for attempt in range(5):
-            try:
-                resp = requests.post(
-                    HF_API_URL,
-                    headers=headers,
-                    json={"inputs": texts, "options": {"wait_for_model": True}},
-                    timeout=60,
-                )
-            except requests.exceptions.RequestException as e:
-                last_error = str(e)
-                time.sleep(3 * (attempt + 1))
-                continue
+    from model_runtime import get_model
 
-            if resp.status_code == 200:
-                return np.array(resp.json(), dtype=np.float32)
-            if resp.status_code == 503:   # model loading on HF side
-                time.sleep(10)
-                continue
-            if resp.status_code == 410:
-                raise RuntimeError(
-                    "HF Inference API endpoint has moved/retired. "
-                    f"Response: {resp.text}"
-                )
-            if resp.status_code >= 500:
-                # Transient server-side error on HF's end — retry with backoff
-                last_error = f"HF Inference API error {resp.status_code}: {resp.text}"
-                time.sleep(3 * (attempt + 1))
-                continue
-            raise RuntimeError(f"HF Inference API error {resp.status_code}: {resp.text}")
-        raise RuntimeError(f"HF Inference API failed after 5 retries. Last error: {last_error}")
-    else:
-        # Local fallback (development / no HF_TOKEN)
-        from functools import lru_cache
-
-        @lru_cache(maxsize=1)
-        def _get_local_model():
-            from sentence_transformers import SentenceTransformer
-            m = SentenceTransformer('all-MiniLM-L6-v2')
-            m.eval()
-            return m
-
-        import torch
-        mdl = _get_local_model()
-        with torch.no_grad():
-            return mdl.encode(texts, show_progress_bar=False,
-                              normalize_embeddings=True, convert_to_numpy=True)
+    mdl = model or get_model()
+    return mdl.encode(
+        texts,
+        show_progress_bar=False,
+        normalize_embeddings=True,
+        convert_to_numpy=True,
+    )
 
 
 def match_jd_to_resume(resume_sections, jd_sections, threshold_strong=0.55, threshold_partial=0.35):
@@ -85,6 +36,8 @@ def match_jd_to_resume(resume_sections, jd_sections, threshold_strong=0.55, thre
         }
     }
     """
+    from sklearn.metrics.pairwise import cosine_similarity
+
     # Flatten all resume chunks and keep track of which section they came from
     resume_chunks = []
     resume_chunk_sources = []

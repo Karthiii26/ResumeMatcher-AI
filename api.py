@@ -2,20 +2,39 @@
 FastAPI backend for ResumeMatch AI with verbose logging.
 Run with: uvicorn api:app --reload --port 8000
 """
-
+import logging
 import io
 import os
-import sys
+import time
+from contextlib import asynccontextmanager
+
+APP_IMPORT_START = time.perf_counter()
 
 # Prevent torch threading issues on CPU
 os.environ["OMP_NUM_THREADS"] = "1"
 os.environ["MKL_NUM_THREADS"] = "1"
+os.environ["TORCH_NUM_THREADS"] = "1"
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-app = FastAPI(title="ResumeMatch AI API", version="1.0.0")
+from matcher import analyze_resume_and_jd
+from model_runtime import is_ready, load_model, startup_timings
+
+logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
+LOGGER = logging.getLogger("resumematch.startup")
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    load_model()
+    LOGGER.info("model_ready=%s startup_timings=%s", is_ready(), startup_timings())
+    yield
+
+
+app = FastAPI(title="ResumeMatch AI API", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -27,6 +46,7 @@ app.add_middleware(
 
 class _FakeFile(io.BytesIO):
     """Wraps bytes and inherits from BytesIO so it is a fully compatible file-like object with a name attribute."""
+
     def __init__(self, data: bytes, name: str):
         super().__init__(data)
         self.name = name
@@ -38,9 +58,24 @@ class _FakeFile(io.BytesIO):
         pass
 
 
+LOGGER.info("startup_timer.python_app_import=%.3fs", time.perf_counter() - APP_IMPORT_START)
+
+
+@app.get("/healthz")
+def healthz():
+    return {"ok": True}
+
+
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    return healthz()
+
+
+@app.get("/readyz")
+def readyz():
+    if is_ready():
+        return {"ready": True}
+    return JSONResponse({"ready": False}, status_code=503)
 
 
 @app.post("/analyze")
@@ -50,7 +85,7 @@ async def analyze(
     resume_file: UploadFile = File(None),
 ):
     print(">>> RECEIVED ANALYZE REQUEST", flush=True)
-    
+
     # Resolve file name
     filename = resume_file.filename if resume_file else "resume.txt"
     print(f">>> Filename: {filename}", flush=True)
@@ -72,15 +107,8 @@ async def analyze(
             status_code=400,
         )
 
-    # Import pipeline here to trace execution
-    print(">>> Importing analyzer pipeline...", flush=True)
-    try:
-        from matcher import analyze_resume_and_jd
-    except Exception as e:
-        print(f">>> ERROR importing matcher: {e}", flush=True)
-        return JSONResponse({"error": f"Import error: {e}"}, status_code=500)
-
     print(">>> Running analyzer pipeline...", flush=True)
+
     try:
         result = analyze_resume_and_jd(
             resume_file=fake,
@@ -89,19 +117,21 @@ async def analyze(
         )
         print(">>> PIPELINE ANALYSIS COMPLETE", flush=True)
         return result
+
     except Exception as exc:
         print(f">>> PIPELINE ERROR: {exc}", flush=True)
         import traceback
         traceback.print_exc()
         return JSONResponse({"error": str(exc)}, status_code=500)
 
+
 # Serve React static files if built (for Docker/HF Spaces production deployment)
 if os.path.exists("static"):
     from fastapi.staticfiles import StaticFiles
     from fastapi.responses import FileResponse
-    
+
     app.mount("/", StaticFiles(directory="static", html=True), name="static")
-    
+
     @app.exception_handler(404)
     async def not_found_handler(request, exc):
         return FileResponse("static/index.html")
