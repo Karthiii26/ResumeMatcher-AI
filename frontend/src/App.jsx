@@ -108,36 +108,71 @@ function FileIcon({ ext }) {
 }
 
 /* ── Loader ──────────────────────────────────────────────────────────────── */
+const LOADER_TIPS = [
+  { icon: '🔍', text: 'Scanning your resume for key skills and experience...' },
+  { icon: '🧠', text: 'AI is matching your profile against the job requirements...' },
+  { icon: '📊', text: 'Calculating your match score and identifying gaps...' },
+  { icon: '✨', text: 'Crafting personalized improvement suggestions just for you...' },
+  { icon: '⚡', text: 'Running semantic analysis on your resume content...' },
+  { icon: '🎯', text: 'Identifying strong matches and missing keywords...' },
+]
+
 function Loader() {
+  // pick 3 random tips each render
+  const tips = LOADER_TIPS.sort(() => 0.5 - Math.random()).slice(0, 3)
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-8 space-y-8 animate-fade-in">
-      <div className="flex flex-col items-center justify-center py-6 gap-3">
-        <div className="relative w-12 h-12">
-          <div className="absolute inset-0 rounded-full border-4 border-slate-100"></div>
-          <div className="absolute inset-0 rounded-full border-4 border-blue-500 border-t-transparent animate-spin"></div>
-        </div>
-        <p className="text-sm font-semibold font-heading text-slate-700 animate-pulse mt-2">
-          Analyzing resume and job description...
-        </p>
-        <p className="text-xs text-slate-400">
-          This usually takes 2–5 seconds
-        </p>
+    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden animate-fade-in">
+      {/* Top accent bar */}
+      <div className="h-1 w-full bg-slate-100">
+        <div className="h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-500 rounded-full loader-progress-bar" style={{ width: '5%' }} />
       </div>
 
-      <div className="space-y-4">
-        <div className="h-4 bg-slate-100 rounded-lg w-1/4 animate-pulse"></div>
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-          <div className="sm:col-span-1 h-36 bg-slate-50 border border-slate-100 rounded-2xl animate-pulse"></div>
-          <div className="sm:col-span-3 grid grid-cols-3 gap-4">
-            <div className="h-36 bg-slate-50 border border-slate-100 rounded-2xl animate-pulse"></div>
-            <div className="h-36 bg-slate-50 border border-slate-100 rounded-2xl animate-pulse"></div>
-            <div className="h-36 bg-slate-50 border border-slate-100 rounded-2xl animate-pulse"></div>
+      <div className="p-8 space-y-8">
+        {/* Animated center */}
+        <div className="flex flex-col items-center gap-5">
+          {/* Pulsing ring + inner rotating arc */}
+          <div className="relative w-16 h-16">
+            <div className="absolute inset-0 rounded-full border-4 border-slate-100" />
+            <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-blue-500 border-r-indigo-400 animate-spin" />
+            <div className="absolute inset-2 rounded-full bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
+              <span className="text-xl">🤖</span>
+            </div>
+          </div>
+
+          {/* Cycling tips */}
+          <div className="relative h-10 w-full max-w-sm">
+            {tips.map((tip, i) => (
+              <div key={i} className="loader-tip text-center px-4">
+                <p className="text-sm font-medium text-slate-700">
+                  <span className="mr-1.5">{tip.icon}</span>{tip.text}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* Dot bounce */}
+          <div className="dot-bounce flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-blue-500 inline-block" />
+            <span className="w-2 h-2 rounded-full bg-indigo-500 inline-block" />
+            <span className="w-2 h-2 rounded-full bg-violet-500 inline-block" />
           </div>
         </div>
 
-        <div className="space-y-3 pt-2">
-          <div className="h-4 bg-slate-100 rounded-lg w-1/5 animate-pulse"></div>
-          <div className="h-20 bg-slate-50 border border-slate-100 rounded-2xl animate-pulse"></div>
+        {/* Skeleton shimmer blocks */}
+        <div className="space-y-4">
+          <div className="h-3.5 bg-slate-100 rounded-lg w-1/4 animate-pulse" />
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+            <div className="sm:col-span-1 h-36 bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-100 rounded-2xl animate-pulse" />
+            <div className="sm:col-span-3 grid grid-cols-3 gap-4">
+              <div className="h-36 bg-gradient-to-br from-emerald-50 to-slate-50 border border-slate-100 rounded-2xl animate-pulse" />
+              <div className="h-36 bg-gradient-to-br from-amber-50 to-slate-50 border border-slate-100 rounded-2xl animate-pulse" />
+              <div className="h-36 bg-gradient-to-br from-red-50 to-slate-50 border border-slate-100 rounded-2xl animate-pulse" />
+            </div>
+          </div>
+          <div className="space-y-3 pt-2">
+            <div className="h-3.5 bg-slate-100 rounded-lg w-1/5 animate-pulse" />
+            <div className="h-20 bg-slate-50 border border-slate-100 rounded-2xl animate-pulse" />
+          </div>
         </div>
       </div>
     </div>
@@ -234,14 +269,23 @@ export default function App() {
 
         {/* ── Hero ────────────────────────────────────────────────────────── */}
         <div className="flex flex-col items-center text-center gap-4">
-          <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm text-xs font-medium text-slate-600">
+          {/* Logo */}
+          <div className="animate-logo-pop">
+            <img
+              src="/logo.jpg"
+              alt="ResumeMatcher AI logo"
+              className="w-16 h-16 rounded-2xl shadow-md object-cover"
+            />
+          </div>
+
+          <div className="animate-hero-badge inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm text-xs font-medium text-slate-600">
             <SparkleIcon size={12} className="text-blue-500" />
             AI-powered resume screening
           </div>
-          <h1 className="font-heading font-bold text-5xl sm:text-6xl tracking-tight" style={{ color: '#0D1526', lineHeight: 1.1 }}>
-            Resume Matcher AI
+          <h1 className="animate-hero-heading font-heading font-bold text-5xl sm:text-6xl tracking-tight" style={{ color: '#0D1526', lineHeight: 1.1 }}>
+            Resume<span style={{ color: '#4F46E5' }}>Matcher</span> AI
           </h1>
-          <p className="text-base text-slate-500 max-w-lg leading-relaxed">
+          <p className="animate-hero-sub text-base text-slate-500 max-w-lg leading-relaxed">
             Upload your resume and a{' '}
             <span className="text-blue-500 font-medium">job description</span>{' '}
             to see how well they align — with a{' '}
@@ -254,7 +298,7 @@ export default function App() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
           {/* ── Resume upload card ─────────────────────────────────────── */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+          <div className="animate-hero-card-left bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
             <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-slate-100">
               <span className="font-heading font-semibold text-sm text-slate-700">Your Resume</span>
               <span className="text-xs text-slate-400">{ACCEPTED_LABEL}</span>
@@ -330,7 +374,7 @@ export default function App() {
           </div>
 
           {/* ── JD textarea card ────────────────────────────────────────── */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+          <div className="animate-hero-card-right bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
             <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-slate-100">
               <label htmlFor="jd-input" className="font-heading font-semibold text-sm text-slate-700">
                 Job Description
@@ -351,7 +395,7 @@ export default function App() {
         </div>
 
         {/* ── Analyze button ───────────────────────────────────────────────── */}
-        <div className="flex flex-col items-center gap-3">
+        <div className="animate-hero-button flex flex-col items-center gap-3">
           <button
             onClick={handleAnalyze}
             disabled={loading || !canAnalyze}
