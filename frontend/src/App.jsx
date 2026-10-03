@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 
-const API = import.meta.env.VITE_API_URL || ''   // Set VITE_API_URL on Vercel to your Render backend URL
+const API = import.meta.env.VITE_API_URL || 'https://resumematcher-ai-e7np.onrender.com'
 
 const ACCEPTED = '.pdf,.docx,.jpg,.jpeg,.png,.webp'
 const ACCEPTED_LABEL = 'PDF, DOCX, JPG, PNG, WEBP'
